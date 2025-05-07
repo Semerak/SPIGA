@@ -1,6 +1,7 @@
 import os
 import cv2
 import pkg_resources
+import torch
 
 # My libs
 import spiga.demo.analyze.track.get_tracker as tr
@@ -83,6 +84,10 @@ def video_app(input_name, spiga_dataset=None, tracker=None, fps=30, save=False,
         processor = pr_spiga.SPIGAProcessor(dataset=spiga_dataset)
         # Initialize Analyzer
         faces_analyzer = VideoAnalyzer(faces_tracker, processor=processor)
+
+        # Check for CUDA availability
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print(f"Using device: {device}")
 
         # Convert FPS to the amount of milliseconds that each frame will be displayed
         if visualize:

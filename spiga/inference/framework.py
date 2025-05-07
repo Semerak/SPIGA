@@ -28,6 +28,9 @@ class SPIGAFramework:
         self.model = SPIGA(num_landmarks=model_cfg.dataset.num_landmarks,
                            num_edges=model_cfg.dataset.num_edges)
 
+        # Check if CUDA is available
+        self.device = torch.device(f'cuda:{gpus[0]}' if torch.cuda.is_available() else 'cpu')
+
         # Load weights and set model
         weights_path = self.model_cfg.model_weights_path
         if weights_path is None:
@@ -42,7 +45,7 @@ class SPIGAFramework:
             model_state_dict = torch.load(weights_file)
 
         self.model.load_state_dict(model_state_dict)
-        self.model = self.model.cuda(gpus[0])
+        self.model = self.model.to(self.device)
         self.model.eval()
         print('SPIGA model loaded!')
 
@@ -133,5 +136,5 @@ class SPIGAFramework:
                 data[k] = self._data2device(v)
         else:
             with torch.no_grad():
-                data_var = data.cuda(device=self.gpus[0], non_blocking=True)
+                data_var = data.to(self.device, non_blocking=True)
         return data_var

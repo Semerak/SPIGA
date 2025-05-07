@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 
 # Third party algorithms. Implementation maintained by SPIGA authors.
 import sort_tracker
@@ -15,9 +16,11 @@ class RetinaSortTracker(tracker.Tracker):
     def __init__(self, config=cfg.cfg_retinasort):
         super().__init__()
 
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.detector = retinaface.RetinaFaceDetector(model=config['retina']['model_name'],
                                                       extra_features=config['retina']['extra_features'],
-                                                      cfg_postreat=config['retina']['postreat'])
+                                                      cfg_postreat=config['retina']['postreat'],
+                                                      device=device)
 
         self.associator = sort_tracker.Sort(max_age=config['sort']['max_age'],
                                             min_hits=config['sort']['min_hits'],
